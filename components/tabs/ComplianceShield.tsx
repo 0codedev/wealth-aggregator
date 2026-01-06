@@ -17,6 +17,7 @@ import { useFiscalYear } from '../../hooks/useFiscalYear';
 import { db, Trade } from '../../database';
 import { motion, AnimatePresence } from 'framer-motion';
 import AuditLog from '../AuditLog';
+import { ITRPreFillPanel } from '../compliance/ITRPreFillPanel';
 
 interface ComplianceShieldProps {
     investments: Investment[];
@@ -268,6 +269,9 @@ const ComplianceShield: React.FC<ComplianceShieldProps> = ({ investments }) => {
                     </div>
                 </div>
             </div>
+
+            {/* ITR Pre-Fill Generator (P2 Enhancement) */}
+            <ITRPreFillPanel />
 
             {/* ALERTS SECTION: Wash Sale & STT Eater */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
