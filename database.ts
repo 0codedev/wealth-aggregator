@@ -176,6 +176,23 @@ export interface Alert {
   notified: boolean;
 }
 
+// Financial Goals (P1 Enhancement)
+export interface Goal {
+  id?: number;
+  name: string;
+  targetAmount: number;
+  targetDate: string; // YYYY-MM-DD
+  currentAmount: number; // Manually tracked or auto-calculated
+  priority: 'Critical' | 'Important' | 'Nice-to-Have';
+  category: 'Retirement' | 'House' | 'Education' | 'Travel' | 'Emergency' | 'Wedding' | 'Vehicle' | 'Other';
+  color: string;
+  linkedInvestmentIds?: string[]; // Investments allocated to this goal
+  inflationRate?: number; // Default 6%
+  createdAt: string;
+  completedAt?: string;
+  notes?: string;
+}
+
 export interface Transaction {
   id: string; // txn_...
   date: string;
@@ -210,6 +227,7 @@ export class TradeDatabase extends Dexie {
   chat_messages!: Table<ChatMessage>;
   alerts!: Table<Alert>;
   transactions!: Table<Transaction>;
+  goals!: Table<Goal>;
 
   constructor() {
     super('WealthAggregatorDB');
@@ -234,6 +252,11 @@ export class TradeDatabase extends Dexie {
 
     (this as any).version(16).stores({
       transactions: 'id, date, category, type, bankName'
+    });
+
+    // Version 17: Goals table for Multi-Goal Tracking
+    (this as any).version(17).stores({
+      goals: '++id, name, priority, category, targetDate, createdAt'
     });
 
     (this as any).on('populate', () => {

@@ -3,7 +3,7 @@ import {
     Target, Compass, TrendingUp, AlertCircle,
     Settings, RefreshCw, CheckCircle2, XCircle,
     Shield, Zap, Gauge, Scale, Table, Download,
-    ArrowUpRight, ArrowDownRight
+    ArrowUpRight, ArrowDownRight, Plus
 } from 'lucide-react';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, ComposedChart, Line
@@ -12,6 +12,9 @@ import { CustomTooltip } from '../../components/shared/CustomTooltip';
 
 import OracleHub from '../dashboard/hubs/OracleHub';
 import { usePortfolio } from '../../hooks/usePortfolio';
+import { useGoals } from '../../hooks/useGoals';
+import { GoalCard } from '../goals/GoalCard';
+import { AddGoalModal } from '../goals/AddGoalModal';
 
 // Helper function defined locally to avoid circular dependency with App.tsx
 const formatCurrency = (value: number) => {
@@ -36,6 +39,10 @@ const GoalGPS: React.FC = () => {
     const [riskProfile, setRiskProfile] = useState<'conservative' | 'balanced' | 'aggressive'>('balanced');
     const [showTable, setShowTable] = useState(false);
     const [scenario, setScenario] = useState<'base' | 'bear' | 'bull'>('base');
+
+    // Multi-Goal Tracking (P1 Enhancement)
+    const [isAddGoalOpen, setIsAddGoalOpen] = useState(false);
+    const { goals, addGoal, updateGoal, deleteGoal, completeGoal, getGoalProgress, getTotalProgress } = useGoals();
 
     // Sync current wealth with portfolio stats when available
     React.useEffect(() => {
@@ -169,6 +176,75 @@ const GoalGPS: React.FC = () => {
 
             {/* ORACLE 2.0 HUB MOVED HERE */}
             <OracleHub totalPortfolioValue={stats?.totalCurrent || 0} />
+
+            {/* Multi-Goal Tracking Section (P1 Enhancement) */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                        <Target className="text-indigo-500" size={20} />
+                        <h3 className="text-lg font-bold text-slate-800 dark:text-white">My Financial Goals</h3>
+                        {goals.length > 0 && (
+                            <span className="text-xs font-bold text-indigo-500 bg-indigo-500/10 px-2 py-1 rounded-full">
+                                {getTotalProgress().toFixed(0)}% Overall
+                            </span>
+                        )}
+                    </div>
+                    <button
+                        onClick={() => setIsAddGoalOpen(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition-all shadow-lg shadow-indigo-500/30"
+                    >
+                        <Plus size={16} />
+                        Add Goal
+                    </button>
+                </div>
+
+                {goals.length === 0 ? (
+                    <div className="text-center py-12">
+                        <Target className="mx-auto text-slate-300 dark:text-slate-700 mb-4" size={48} />
+                        <p className="text-slate-500 font-bold">No goals yet</p>
+                        <p className="text-sm text-slate-400 mt-1">Create your first financial goal to track progress</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {goals.filter(g => !g.completedAt).map(goal => (
+                            <GoalCard
+                                key={goal.id}
+                                goal={goal}
+                                progress={getGoalProgress(goal)}
+                                onUpdate={updateGoal}
+                                onDelete={deleteGoal}
+                                onComplete={completeGoal}
+                            />
+                        ))}
+                    </div>
+                )}
+
+                {/* Completed Goals Section */}
+                {goals.filter(g => g.completedAt).length > 0 && (
+                    <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800">
+                        <p className="text-xs font-bold text-slate-400 uppercase mb-3">🏆 Completed Goals</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {goals.filter(g => g.completedAt).map(goal => (
+                                <GoalCard
+                                    key={goal.id}
+                                    goal={goal}
+                                    progress={100}
+                                    onUpdate={updateGoal}
+                                    onDelete={deleteGoal}
+                                    onComplete={completeGoal}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Add Goal Modal */}
+            <AddGoalModal
+                isOpen={isAddGoalOpen}
+                onClose={() => setIsAddGoalOpen(false)}
+                onAdd={addGoal}
+            />
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
