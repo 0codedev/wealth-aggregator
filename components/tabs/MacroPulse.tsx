@@ -8,6 +8,7 @@ import {
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell
 } from 'recharts';
+import { IPOCalendarWidget } from '../market/IPOCalendarWidget';
 
 // --- MOCK DATA GENERATORS ---
 const generateTrendData = (startVal: number, volatility: number) => {
@@ -554,6 +555,9 @@ const MacroPulse: React.FC = () => {
                         ))}
                     </div>
                 </div>
+
+                {/* IPO Calendar (P2 Enhancement) */}
+                <IPOCalendarWidget />
             </div>
         </div>
     );

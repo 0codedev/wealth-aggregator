@@ -63,6 +63,8 @@ export interface Trade {
     completed: boolean;
     completedAt?: string;
   };
+  // P2: Trade Tagging System
+  tags?: string[]; // Custom tags like 'Earnings', 'Breakout', 'Momentum', etc.
 }
 
 export interface Dividend {
